@@ -1,5 +1,5 @@
 {
-  "name": "eslint-plugin-css-modules",
+  "name": "@brendankemp/eslint-plugin-css-modules",
   "version": "3.0.0",
   "description": "Checks that you are using the existent css/scss/less classes, no more no less",
   "main": "./build/cjs/index.js",
@@ -21,7 +21,7 @@
     "build": "rm -rf build && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
     "test": "mocha 'test/**/*.test.ts' --require tsx",
     "my-pre-publish": "npm run test && npm run build",
-    "my-publish": "npm run my-pre-publish && yarn publish"
+    "my-publish": "npm run my-pre-publish && npm publish --access public"
   },
   "engines": {
     "node": ">=16.0.0"
