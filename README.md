@@ -1,6 +1,5 @@
 # eslint-plugin-css-modules
 
-[![Build Status](https://travis-ci.org/atfzl/eslint-plugin-css-modules.svg?branch=master)](https://travis-ci.org/atfzl/eslint-plugin-css-modules)
 
 This plugin intends to help you in tracking down problems when you are using css-modules. It tells if you are using a non-existent css/scss/less class in js or if you forgot to use some classes which you declared in css/scss/less.
 
@@ -30,19 +29,31 @@ Add all such classes in the array.
 ## Installation
 
 ```
-npm i --save-dev eslint-plugin-css-modules
+npm i --save-dev @brendankemp/eslint-plugin-css-modules
 ```
 
-## Usage:
+## Usage
 
-.eslintrc
+### Flat config (ESLint 9+, `eslint.config.ts` / `eslint.config.js`)
+
+```ts
+import cssModules from "@brendankemp/eslint-plugin-css-modules";
+import { defineConfig } from "eslint/config";
+
+export default defineConfig([
+  cssModules.configs["flat/recommended"],
+]);
+```
+
+### Legacy config (`.eslintrc`)
+
 ```json
 {
   "plugins": [
-    "css-modules"
+    "@brendankemp/css-modules"
   ],
   "extends": [
-    "plugin:css-modules/recommended"
+    "plugin:@brendankemp/css-modules/recommended"
   ]
 }
 ```
@@ -51,12 +62,6 @@ You may also tweak the rules individually. For instance, if you use the [camelCa
 
 ```json
 {
-  "plugins": [
-    "css-modules"
-  ],
-  "extends": [
-    "plugin:css-modules/recommended"
-  ],
   "rules": {
     "css-modules/no-unused-class": [2, { "camelCase": true }],
     "css-modules/no-undef-class": [2, { "camelCase": true }]
@@ -125,18 +130,19 @@ You can specify multiple aliases:
 ### Flat config (eslint.config.ts)
 
 ```ts
-import cssModules from "eslint-plugin-css-modules"
+import cssModules from "@brendankemp/eslint-plugin-css-modules";
+import { defineConfig } from "eslint/config";
 
 export default defineConfig([
   {
     ...cssModules.configs["flat/recommended"],
     settings: {
       "css-modules": {
-        aliases: { "@/": "src/" }
-      }
-    }
+        aliases: { "@/": "src/" },
+      },
+    },
   },
-])
+]);
 ```
 
 ## Screen Shot
