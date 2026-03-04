@@ -3,7 +3,7 @@ import { RuleTester as EslintRuleTester } from 'eslint';
 import { test } from 'mocha';
 
 /* pattern taken from eslint-plugin-import */
-export function addFilenameOption (testCase) {
+export function addFilenameOption (testCase: any) {
   return {
     ...testCase,
     // TODO:  Find a way to remove this.
@@ -15,16 +15,16 @@ export function addFilenameOption (testCase) {
  * Customizing ESLint rule tester to be run by Mocha.
  * @see https://eslint.org/docs/latest/integrate/nodejs-api#customizing-ruletester
  */
-EslintRuleTester.describe = (text, method) => {
-  EslintRuleTester.it.title = text;
+(EslintRuleTester as any).describe = (text: string, method: () => void) => {
+  (EslintRuleTester as any).it.title = text;
   return method.call(this);
 };
 
-EslintRuleTester.it = (text, method) => {
-  test(EslintRuleTester.it.title + ': ' + text, method);
+(EslintRuleTester as any).it = (text: string, method: () => void) => {
+  test((EslintRuleTester as any).it.title + ': ' + text, method);
 };
 
-export const RuleTester = () => {
+export function RuleTester () {
   return new EslintRuleTester({
     parserOptions: {
       sourceType: 'module',
@@ -32,4 +32,4 @@ export const RuleTester = () => {
       ecmaFeatures: { jsx: true },
     },
   });
-};
+}

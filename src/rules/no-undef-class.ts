@@ -1,4 +1,3 @@
-/* @flow */
 import _ from 'lodash';
 
 import {
@@ -12,7 +11,7 @@ import {
   getFilePath,
 } from '../core';
 
-import type { JsNode } from '../types';
+import { JsNode } from '../types';
 
 export default {
   meta: {
@@ -29,7 +28,7 @@ export default {
       }
     ],
   },
-  create (context: Object) {
+  create (context: any) {
     const camelCase = _.get(context, 'options[0].camelCase');
 
     /*
@@ -49,7 +48,7 @@ export default {
        1. classesMap: an object with propertyName as key and its className as value
        2. node: node that correspond to s (see example above)
      */
-    const map = {};
+    const map: Record<string, any> = {};
 
     return {
       ImportDeclaration (node: JsNode) {
@@ -66,15 +65,20 @@ export default {
         } = styleImportNodeData;
 
         const styleFileAbsolutePath = getFilePath(context, styleFilePath);
-        let classesMap = {};
-        let exportPropsMap = {};
+        let classesMap: Record<string, any> | null = {};
+        let exportPropsMap: Record<string, any> | null = {};
 
         if (fileExists(styleFileAbsolutePath)) {
           const ast = getAST(styleFileAbsolutePath);
-          const classes = ast && getStyleClasses(ast);
-
-          classesMap = classes && getClassesMap(classes, camelCase);
-          exportPropsMap = ast && getExportPropsMap(ast);
+          if (ast) {
+            const classes = getStyleClasses(ast);
+            classesMap = classes ? getClassesMap(classes, camelCase) : null;
+            exportPropsMap = getExportPropsMap(ast);
+          } else {
+            // file exists but can't be parsed - don't report errors
+            classesMap = null;
+            exportPropsMap = null;
+          }
         }
 
         // this will be used to check if classes are defined
@@ -91,7 +95,7 @@ export default {
            Check if property exists in css/scss file as class
          */
 
-        const objectName = node.object.name;
+        const objectName = (node as any).object.name;
 
         const propertyName = getPropertyName(node, camelCase);
 
@@ -104,7 +108,7 @@ export default {
 
         if (classesMap && classesMap[propertyName] == null &&
             exportPropsMap && exportPropsMap[propertyName] == null) {
-          context.report(node.property, `Class or exported property '${propertyName}' not found`);
+          context.report((node as any).property, `Class or exported property '${propertyName}' not found`);
         }
       }
     };

@@ -1,22 +1,30 @@
 {
   "name": "eslint-plugin-css-modules",
-  "version": "2.12.0",
+  "version": "3.0.0",
   "description": "Checks that you are using the existent css/scss/less classes, no more no less",
-  "main": "build/index.js",
+  "main": "./build/cjs/index.js",
+  "module": "./build/esm/index.js",
+  "types": "./build/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/esm/index.d.ts",
+      "import": "./build/esm/index.js",
+      "require": "./build/cjs/index.js",
+      "default": "./build/cjs/index.js"
+    }
+  },
   "files": [
     "build",
     "packages"
   ],
   "scripts": {
-    "watch": "babel lib -d build --watch",
-    "build": "rm -rf build && babel lib -d build",
-    "lint": "eslint lib test",
-    "test": "mocha 'test/**/*.test.js' --compilers js:@babel/register",
+    "build": "rm -rf build && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "test": "mocha 'test/**/*.test.ts' --require tsx",
     "my-pre-publish": "npm run test && npm run build",
     "my-publish": "npm run my-pre-publish && yarn publish"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=16.0.0"
   },
   "keywords": [
     "eslint",
@@ -25,37 +33,29 @@
     "css-modules"
   ],
   "author": {
-    "name": "Atif Afzal",
-    "email": "atif5801@gmail.com",
-    "url": "http://atfzl.me"
+    "name": "Brendan Kemp",
+    "email": "brendan.kemp@gmail.com",
+    "url": "https://brendankemp.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/atfzl/eslint-plugin-css-modules.git"
+    "url": "git://github.com/brendankemp/eslint-plugin-css-modules.git"
   },
   "license": "MIT",
   "peerDependencies": {
     "eslint": ">=2.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.23.0",
-    "@babel/core": "^7.23.0",
-    "@babel/eslint-parser": "^7.22.15",
-    "@babel/plugin-proposal-export-default-from": "^7.22.17",
-    "@babel/plugin-syntax-flow": "^7.22.5",
-    "@babel/plugin-transform-flow-strip-types": "^7.22.5",
-    "@babel/preset-env": "^7.22.20",
-    "@babel/register": "^7.22.15",
+    "@types/chai": "^5.2.3",
+    "@types/eslint": "^9.6.1",
+    "@types/lodash": "^4.17.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.11.0",
     "chai": "^4.3.9",
     "eslint": "^8.50.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-mocha": "^10.2.0",
-    "eslint-plugin-n": "^16.1.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "flow-bin": "^0.36.0",
-    "mocha": "^3.2.0",
-    "nodemon": "^3.0.1"
+    "mocha": "^10.2.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
   },
   "dependencies": {
     "gonzales-pe": "^4.3.0",

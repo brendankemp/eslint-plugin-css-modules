@@ -1,5 +1,5 @@
 /* eslint-disable mocha/no-setup-in-describe */
-import rule from '../../../lib/rules/no-unused-class';
+import rule from '../../../src/rules/no-unused-class';
 import { RuleTester, addFilenameOption } from '../../utils';
 
 const ruleTester = new RuleTester();

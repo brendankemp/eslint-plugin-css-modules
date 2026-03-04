@@ -1,12 +1,10 @@
-// @flow
-
 import fs from 'fs';
 import path from 'path';
 import fp from 'lodash/fp';
 import _ from 'lodash';
 import gonzales from 'gonzales-pe';
 
-import type { JsNode, gASTNode } from '../types';
+import { JsNode, gASTNode } from '../types';
 
 import {
   getRegularClassesMap,
@@ -19,13 +17,13 @@ import {
 
 const styleExtensionRegex = /\.(s?css|less)$/;
 
-function dashesCamelCase (str: string) {
-  return str.replace(/-+(\w)/g, function (match, firstLetter) {
+function dashesCamelCase (str: string): string {
+  return str.replace(/-+(\w)/g, function (_match: string, firstLetter: string) {
     return firstLetter.toUpperCase();
   });
 }
 
-export const getFilePath = (context, styleFilePath) => {
+export const getFilePath = (context: any, styleFilePath: string): string => {
   const settings = context.settings['css-modules'];
 
   const dirName = path.dirname(context.getFilename());
@@ -36,16 +34,19 @@ export const getFilePath = (context, styleFilePath) => {
     : path.resolve(basePath, styleFilePath);
 };
 
-export const getPropertyName = (node: JsNode): ?string => {
-  const propertyName = node.computed
+export const getPropertyName = (node: JsNode, ..._args: any[]): string | null => {
+  const computed = (node as any).computed;
+  const property = (node as any).property;
+
+  const propertyName = computed
     /*
        square braces eg s['header']
        we won't use node.property.name because it is for cases like
        s[abc] where abc is a variable
      */
-    ? node.property.value
+    ? property.value
     /* dot notation, eg s.header */
-    : node.property.name;
+    : property.name;
 
   /*
      skip property names starting with _
@@ -63,36 +64,36 @@ export const getPropertyName = (node: JsNode): ?string => {
   return propertyName;
 };
 
-export const getClassesMap = (classes: Object, camelCase: string|boolean): Object => {
-  const classesMap = {};
+export const getClassesMap = (classes: Record<string, any>, camelCase: string | boolean): Record<string, string> => {
+  const classesMap: Record<string, string> = {};
 
   // Unroll the loop because of performance!
   // Remember that this function will run on every lint (e.g.: on file save)
   switch (camelCase) {
     case true:
-      _.forIn(classes, (value, className) => {
+      _.forIn(classes, (_value: any, className: string) => {
         classesMap[className] = className;
         classesMap[_.camelCase(className)] = className;
       });
       break;
     case 'dashes':
-      _.forIn(classes, (value, className) => {
+      _.forIn(classes, (_value: any, className: string) => {
         classesMap[className] = className;
         classesMap[dashesCamelCase(className)] = className;
       });
       break;
     case 'only':
-      _.forIn(classes, (value, className) => {
+      _.forIn(classes, (_value: any, className: string) => {
         classesMap[_.camelCase(className)] = className;
       });
       break;
     case 'dashes-only':
-      _.forIn(classes, (value, className) => {
+      _.forIn(classes, (_value: any, className: string) => {
         classesMap[dashesCamelCase(className)] = className;
       });
       break;
     default:
-      _.forIn(classes, (value, className) => {
+      _.forIn(classes, (_value: any, className: string) => {
         classesMap[className] = className;
       });
   }
@@ -100,23 +101,25 @@ export const getClassesMap = (classes: Object, camelCase: string|boolean): Objec
   return classesMap;
 };
 
-export const getStyleImportNodeData = (node: JsNode): ?Object => {
+export const getStyleImportNodeData = (node: JsNode): { importName: string; styleFilePath: string; importNode: any } | undefined => {
   // path from which it was imported
-  const styleFilePath = fp.get('source.value')(node);
+  const styleFilePath = (fp as any).get('source.value')(node);
 
   if (styleFilePath && styleExtensionRegex.test(styleFilePath)) {
-    const importNode = fp.compose(
-      fp.find({ type: 'ImportDefaultSpecifier' }),
-      fp.get('specifiers'),
+    const importNode = (fp as any).compose(
+      (fp as any).find({ type: 'ImportDefaultSpecifier' }),
+      (fp as any).get('specifiers'),
     )(node);
 
     // the default imported name
-    const importName = fp.get('local.name')(importNode);
+    const importName = (fp as any).get('local.name')(importNode);
 
     if (importName) { // it had a default import
       return { importName, styleFilePath, importNode };
     }
   }
+
+  return undefined;
 };
 
 export const fileExists = (filePath: string): boolean => {
@@ -144,7 +147,7 @@ export const getAST = (filePath: string): gASTNode | null => {
   }
 };
 
-export const getStyleClasses = (ast: gASTNode): ?Object => {
+export const getStyleClasses = (ast: gASTNode): Record<string, any> => {
   /*
      mutates ast by removing :global scopes
    */
@@ -163,7 +166,7 @@ export const getStyleClasses = (ast: gASTNode): ?Object => {
   };
 };
 
-export const getExportPropsMap = (ast: gASTNode): ?Object => {
+export const getExportPropsMap = (ast: gASTNode): Record<string, any> => {
   const exportPropsMap = getICSSExportPropsMap(ast);
   return {
     ...exportPropsMap

@@ -1,4 +1,3 @@
-/* @flow */
 import fp from 'lodash/fp';
 import _ from 'lodash';
 import path from 'path';
@@ -13,7 +12,7 @@ import {
   fileExists,
 } from '../core';
 
-import type { JsNode } from '../types';
+import { JsNode } from '../types';
 
 export default {
   meta: {
@@ -31,7 +30,7 @@ export default {
       }
     ],
   },
-  create (context: Object) {
+  create (context: any) {
     const markAsUsed = _.get(context, 'options[0].markAsUsed');
     const camelCase = _.get(context, 'options[0].camelCase');
 
@@ -54,7 +53,7 @@ export default {
        2. classesMap: an object with propertyName as key and its className as value
        3. node: node that correspond to s (see example above)
      */
-    const map = {};
+    const map: Record<string, any> = {};
 
     return {
       ImportDeclaration (node: JsNode) {
@@ -72,14 +71,14 @@ export default {
 
         const styleFileAbsolutePath = getFilePath(context, styleFilePath);
 
-        let classes = {};
-        let classesMap = {};
+        let classes: Record<string, any> = {};
+        let classesMap: Record<string, any> = {};
 
         if (fileExists(styleFileAbsolutePath)) {
           // this will be used to mark s.foo as used in MemberExpression
           const ast = getAST(styleFileAbsolutePath);
-          classes = ast && getStyleClasses(ast);
-          classesMap = classes && getClassesMap(classes, camelCase);
+          classes = (ast && getStyleClasses(ast)) || {};
+          classesMap = (classes && getClassesMap(classes, camelCase)) || {};
         }
 
         _.set(map, `${importName}.classes`, classes);
@@ -96,7 +95,7 @@ export default {
            Check if property exists in css/scss file as class
          */
 
-        const objectName = node.object.name;
+        const objectName = (node as any).object.name;
         const propertyName = getPropertyName(node, camelCase);
 
         if (!propertyName) {
@@ -126,21 +125,21 @@ export default {
            ```
            then the loop will be run 2 times
          */
-        _.forIn(map, (o) => {
+        _.forIn(map, (o: any) => {
           const { classes, node, filePath } = o;
 
           /*
              if option is passed to mark a class as used, example:
              eslint css-modules/no-unused-class: [2, { markAsUsed: ['container'] }]
            */
-          _.forEach(markAsUsed, (usedClass) => {
+          _.forEach(markAsUsed, (usedClass: string) => {
             classes[usedClass] = true;
           });
 
           // classNames not marked as true are unused
-          const unusedClasses = fp.compose(
-            fp.keys,
-            fp.omitBy(fp.identity), // omit truthy values
+          const unusedClasses = (fp as any).compose(
+            (fp as any).keys,
+            (fp as any).omitBy((fp as any).identity), // omit truthy values
           )(classes);
 
           if (!_.isEmpty(unusedClasses)) {

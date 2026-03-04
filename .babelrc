@@ -1,9 +1,0 @@
-{
-  "presets": ["@babel/preset-env"],
-  "plugins": [
-    "@babel/plugin-syntax-flow",
-    "@babel/transform-flow-strip-types",
-    "@babel/plugin-proposal-export-default-from"
-  ],
-  "sourceMaps": "inline"
-}
