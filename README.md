@@ -83,6 +83,62 @@ You can specify path for the base directory via plugin settings in .eslintrc. Th
 }
 ```
 
+## Path aliases
+
+If your project uses path aliases (e.g. `@/` mapped to `src/` via TypeScript paths or a bundler like Vite/Webpack), you can configure them so the plugin can resolve aliased imports:
+
+```json
+{
+  "settings": {
+    "css-modules": {
+      "aliases": {
+        "@/": "src/"
+      }
+    }
+  }
+}
+```
+
+With this configuration, an import like:
+
+```js
+import styles from '@/shared/components/ScrollableList.module.scss';
+```
+
+will be resolved to `src/shared/components/ScrollableList.module.scss`.
+
+You can specify multiple aliases:
+
+```json
+{
+  "settings": {
+    "css-modules": {
+      "aliases": {
+        "@/": "src/",
+        "~components/": "src/components/"
+      }
+    }
+  }
+}
+```
+
+### Flat config (eslint.config.ts)
+
+```ts
+import cssModules from "eslint-plugin-css-modules"
+
+export default defineConfig([
+  {
+    ...cssModules.configs["flat/recommended"],
+    settings: {
+      "css-modules": {
+        aliases: { "@/": "src/" }
+      }
+    }
+  },
+])
+```
+
 ## Screen Shot
 
 ![ScreenShot](https://raw.githubusercontent.com/atfzl/eslint-plugin-css-modules/master/screenshots/screenshot3.png)

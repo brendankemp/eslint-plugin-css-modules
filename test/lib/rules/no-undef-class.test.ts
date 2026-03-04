@@ -315,6 +315,21 @@ describe('no-undef-class', function () {
         `,
         options: [{ camelCase: 'dashes-only' }],
       },
+      {
+        name: 'aliases: resolves @/ alias to test/files/',
+        code: `
+          import s from '@/noUndefClass1.scss';
+
+          export default Foo = () => (
+            <div className={s.container}></div>
+          );
+        `,
+        settings: {
+          'css-modules': {
+            aliases: { '@/': 'test/files/' },
+          },
+        },
+      },
     ].map((testCase) => addFilenameOption(testCase)),
     invalid: [
       {
@@ -535,6 +550,22 @@ describe('no-undef-class', function () {
           "Class or exported property 'snake_cased' not found",
           "Class or exported property 'foo-baz' not found",
         ],
+      },
+      {
+        name: 'aliases: reports undefined class when using alias',
+        code: `
+          import s from '@/noUndefClass1.scss';
+
+          export default Foo = () => (
+            <div className={s.containr}></div>
+          );
+        `,
+        settings: {
+          'css-modules': {
+            aliases: { '@/': 'test/files/' },
+          },
+        },
+        errors: ["Class or exported property 'containr' not found"],
       },
       {
         name: 'should detect if camel case properties are NOT defined when camelCase=dashes-only',

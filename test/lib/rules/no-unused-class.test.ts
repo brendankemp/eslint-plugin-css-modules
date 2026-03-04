@@ -186,7 +186,7 @@ describe('no-unused-class', function () {
         name: 'check if camelCase=dashes-only classes work as expected',
         code: `
           import s from './noUnusedClass3.scss';
-  
+
           export default Foo = () => (
             <div className={s.fooBar}>
               <div className={s.barFoo}></div>
@@ -196,6 +196,21 @@ describe('no-unused-class', function () {
           );
         `,
         options: [{ camelCase: 'dashes-only' }],
+      },
+      {
+        name: 'aliases: resolves @/ alias to test/files/',
+        code: `
+          import s from '@/noUndefClass1.scss';
+
+          export default Foo = () => (
+            <div className={s.container}></div>
+          );
+        `,
+        settings: {
+          'css-modules': {
+            aliases: { '@/': 'test/files/' },
+          },
+        },
       },
     ].map((testCase) => addFilenameOption(testCase)),
     invalid: [
@@ -338,6 +353,22 @@ describe('no-unused-class', function () {
         errors: [
           'Unused classes found in noUnusedClass3.scss: foo-bar, alreadyCamelCased',
         ],
+      },
+      {
+        name: 'aliases: reports unused class when using alias',
+        code: `
+          import s from '@/noUnusedClass1.scss';
+
+          export default Foo = () => (
+            <div className={s.bar}></div>
+          );
+        `,
+        settings: {
+          'css-modules': {
+            aliases: { '@/': 'test/files/' },
+          },
+        },
+        errors: ['Unused classes found in noUnusedClass1.scss: foo, bold'],
       },
       {
         name: 'should detect if camel case properties are NOT used when camelCase=dashes-only',

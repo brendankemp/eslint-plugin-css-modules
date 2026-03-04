@@ -28,6 +28,15 @@ export const getFilePath = (context: any, styleFilePath: string): string => {
 
   const dirName = path.dirname(context.getFilename());
   const basePath = (settings && settings.basePath) ? settings.basePath : '';
+  const aliases: Record<string, string> = (settings && settings.aliases) || {};
+
+  // Check if the import matches any configured alias
+  for (const [alias, aliasPath] of Object.entries(aliases)) {
+    if (styleFilePath.startsWith(alias)) {
+      const resolved = styleFilePath.replace(alias, aliasPath);
+      return path.resolve(resolved);
+    }
+  }
 
   return styleFilePath.startsWith('.')
     ? path.resolve(dirName, styleFilePath)
